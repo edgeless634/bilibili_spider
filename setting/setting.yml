@@ -1,0 +1,8 @@
+launcher:
+    comment_fetcher_thread_num: 4
+commentFetcher:
+    wait_time_each: 3
+proxyFetch:
+    enable: false
+    api_url: "http://192.168.1.21:10001/get/"
+    proxy_for_proxyfetch: "http://127.0.0.1:10809"

@@ -1,6 +1,10 @@
+from helper import launcher
 from email.policy import default
 import click
 import version
+import logging
+
+logging.basicConfig(level=logging.INFO)
 
 @click.group()
 def cli():
@@ -8,7 +12,7 @@ def cli():
 
 @click.command(name="run")
 def run_spider():
-    click.echo("RUNNING")
+    launcher.launch()
 
 @click.command(name="version")
 def show_version():
