@@ -2,11 +2,18 @@ import os
 import yaml
 
 __default_str = """
-spider:
-    wait_time: 0.2
+launcher:
+    danmaku_fetcher_thread_num: 4
+    user_following_fetcher_thread_num: 1
+DanmakuFetcher:
+    wait_time_each: 5
+UserFollowingFetcher:
+    wait_time_each: 5
+    wait_time_each_step: 2
 proxyFetch:
     enable: false
-    proxy_for_proxyfetch: "http://127.0.0.1:1080"
+    api_url: "http://192.168.1.21:10001/get/"
+    proxy_for_proxyfetch: "http://127.0.0.1:10809"
 """
 setting = None
 
