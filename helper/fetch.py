@@ -130,7 +130,7 @@ class UserFollowingFetcher(BaseFetcher):
             logging.info(f"[UserFollowingFetcher] Checking: {mid}")
             ret = self.biliApi.get_user_fans_num_by_mid(mid)
             if ret is None:
-                return self.biliApi.get_user_level_by_mid(mid) > 3
+                return self.biliApi.get_user_level_by_mid(mid) > 4
             elif ret < 1000:
                 return False
             return True
