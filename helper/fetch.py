@@ -36,7 +36,7 @@ class CommentFetcher(BaseFetcher):
         super().__init__()
         self.up_field = "up_mid"
         self.down_field = "video_comment"
-        self.sleep_time_each = setting["commentFetcher"]["wait_time_each"]
+        self.sleep_time_each = setting["CommentFetcher"]["wait_time_each"]
         self.found_up = set()
         self.BiliApi = BiliApi()
 
@@ -57,7 +57,7 @@ class CommentFetcher(BaseFetcher):
             cid = self.BiliApi.get_cid_by_aid(aid)
             comment = self.BiliApi.get_danmaku_list_by_cid(cid)
             datafields.save_to_field(self.down_field, "\n".join(comment), filename=f"{aid}.txt")
-            logging.info(f"[save_video_comment] Saved: {aid}")
+            logging.info(f"[CommentFetcher] Saved: {aid}")
 
             use_time = time.perf_counter() - t
             sleep_time = self.sleep_time_each - use_time
@@ -67,4 +67,65 @@ class CommentFetcher(BaseFetcher):
     def run(self):
         for mid in self.get_up_mid():
             self.save_video_comment(mid)
+
+
+class UserFollowingFetcher(BaseFetcher):
+    def __init__(self):
+        super().__init__()
+        self.up_field = "up_mid"
+        self.down_field = "up_mid"
+        self.sleep_time_each = setting["UserFollowingFetcher"]["wait_time_each"]
+        self.sleep_time_each_step = setting["UserFollowingFetcher"]["wait_time_each_step"]
+        self.found_mid = set()
+        self.biliApi = BiliApi()
     
+    def get_mid(self):
+        while True:
+            mid = datafields.get_field_data(self.up_field)
+            if mid is None:
+                return
+            if mid not in self.found_mid:
+                yield mid
+                self.found_mid.add(mid)
+    
+    def save_user_following(self, mid):
+        logging.info(f"[UserFollowingFetcher] Start scanning: {mid}")
+        followings = self.biliApi.get_following_by_mid(mid)
+
+        followings_filtered = []
+
+        def filter_following(mid):
+            logging.info(f"[UserFollowingFetcher] Checking: {mid}")
+            ret = self.biliApi.get_user_fans_num_by_mid(mid)
+            if ret is None:
+                return self.biliApi.get_user_level_by_mid(mid) > 3
+            elif ret < 1000:
+                return False
+            return True
+
+        for follow_mid in followings:
+            t = time.perf_counter()
+
+            if filter_following(follow_mid):
+                followings_filtered.append(follow_mid)
+            
+            use_time = time.perf_counter() - t
+            sleep_time = self.sleep_time_each_step - use_time
+            if sleep_time > 0:
+                time.sleep(sleep_time)
+
+        if followings_filtered == []:
+            return
+
+        datafields.save_to_field(self.down_field, "\n".join(followings_filtered), filename=f"{mid}_followings.txt")
+    
+    def run(self):
+        for mid in self.get_mid():
+            t = time.perf_counter()
+
+            self.save_user_following(mid)
+
+            use_time = time.perf_counter() - t
+            sleep_time = self.sleep_time_each - use_time
+            if sleep_time > 0:
+                time.sleep(sleep_time)

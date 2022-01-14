@@ -1,7 +1,11 @@
 launcher:
     comment_fetcher_thread_num: 4
-commentFetcher:
+    user_following_fetcher_thread_num: 1
+CommentFetcher:
     wait_time_each: 5
+UserFollowingFetcher:
+    wait_time_each: 5
+    wait_time_each_step: 2
 proxyFetch:
     enable: false
     api_url: "http://192.168.1.21:10001/get/"

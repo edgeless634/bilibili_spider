@@ -99,7 +99,7 @@ class BiliApi:
                     if d["code"] == 0:
                         break
                     else:
-                        logging.warning(f"[get_up_video_by_mid]网络错误: {d}")
+                        logging.warning(f"[get_up_video_by_mid]网络错误: {d}, {input_mid}")
                         time.sleep(1)
                 except requests.exceptions.RequestException as e:
                     logging.warning(f"[get_up_video_by_mid]网络不稳定：{e}")
@@ -118,6 +118,75 @@ class BiliApi:
             if pn * 30 > video_count:
                 break
         return ret
+
+    def get_user_info_by_mid(self, input_mid: int):
+        '''
+        获取用户基本信息
+        '''
+        url = "https://api.bilibili.com/x/relation/stat"
+        while True:
+            try:
+                r = requests.get(
+                    url,
+                    headers=self.headers,
+                    params = {"vmid": input_mid, "jsonp": "jsonp"},
+                    proxies = self.proxies,
+                    timeout=self.__timeout
+                )
+                r.encoding = r.apparent_encoding
+                d = json.loads(r.text)
+                if d["code"] == 0 or d["code"] == 22115:
+                    # {'code': 22115, 'message': '用户已设置隐私，无法查看', 'ttl': 1}
+                    break
+            except requests.exceptions.RequestException:
+                pass
+        if d["code"] == 22115:
+            return None
+        return d["data"]
+    
+    def get_user_level_by_mid(self, input_mid: int):
+        '''
+        获取用户的等级
+        '''
+        user_info = self.get_user_info_by_mid(input_mid)
+        if user_info is None:
+            return None
+        return d["level"]
+
+    def get_relationship_info_by_mid(self, input_mid: int):
+        '''
+        获取用户关注和粉丝数
+        '''
+        url = "https://api.bilibili.com/x/relation/stat"
+        while True:
+            try:
+                r = requests.get(
+                    url,
+                    headers=self.headers,
+                    params = {"vmid": input_mid, "jsonp": "jsonp"},
+                    proxies = self.proxies,
+                    timeout=self.__timeout
+                )
+                r.encoding = r.apparent_encoding
+                d = json.loads(r.text)
+                if d["code"] == 0 or d["code"] == 22115:
+                    # {'code': 22115, 'message': '用户已设置隐私，无法查看', 'ttl': 1}
+                    break
+            except requests.exceptions.RequestException:
+                pass
+        if d["code"] == 22115:
+            return None
+        return d["data"]
+    
+    def get_user_fans_num_by_mid(self, input_mid: int) -> list:
+        '''
+        返回用户的粉丝数，如果没有权限则返回None
+        '''
+        relationship_info = self.get_user_info_by_mid(input_mid)
+        if relationship_info is None:
+            return None
+        return relationship_info["follower"]
+
 
     def get_following_by_mid(self, input_mid: int) -> list:
         '''
@@ -138,14 +207,24 @@ class BiliApi:
                     )
                     r.encoding = r.apparent_encoding
                     d = json.loads(r.text)
-                    if d["code"] == 0:
+                    if d["code"] == 0 or d["code"] == 22115 or d["code"] == 22007:
+                        # {'code': 22007, 'message': '限制只访问前5页', 'ttl': 1}
+                        # {'code': 22115, 'message': '用户已设置隐私，无法查看', 'ttl': 1}
                         break
                     else:
-                        logging.warning(f"[get_up_video_by_mid]网络错误: {d}")
+                        logging.warning(f"[get_following_by_mid]网络错误: {d}")
                         time.sleep(1)
                 except requests.exceptions.RequestException as e:
-                    logging.warning(f"[get_up_video_by_mid]网络不稳定：{e}")
+                    logging.warning(f"[get_following_by_mid]网络不稳定：{e}")
                     time.sleep(1)
+
+            if d["code"] == 22115:
+                # {'code': 22115, 'message': '用户已设置隐私，无法查看', 'ttl': 1}
+                break
+
+            if d["code"] == 22007:
+                # {'code': 22007, 'message': '限制只访问前5页', 'ttl': 1}
+                break
 
             followings = d["data"]["list"]
             assert isinstance(followings, list)

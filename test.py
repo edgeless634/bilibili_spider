@@ -1,5 +1,7 @@
 import logging
 
+logging.basicConfig(level=logging.INFO)
+
 def setting_test():
     from setting.settingReader import setting
     logging.info(f"Get setting: {setting}")
@@ -21,7 +23,8 @@ def biliApi_test():
     print(danmaku[:8])
     followings = bili_api.get_following_by_mid(385842994)
     print(followings[:10])
-
+    relations = bili_api.get_relationship_info_by_mid(385842994)
+    print(relations)
 
 def CommentFetcher_test():
     from helper.fetch import CommentFetcher
@@ -29,5 +32,11 @@ def CommentFetcher_test():
     t.start()
     t.join()
 
+def UserFollowingFetcher_test():
+    from helper.fetch import UserFollowingFetcher
+    t = UserFollowingFetcher()
+    t.start()
+    t.join()
+
 if __name__ == '__main__':
-    biliApi_test()
+    UserFollowingFetcher_test()
