@@ -1,6 +1,6 @@
 import logging
 
-from fetcher.biliApi import BiliApi
+from api.biliApi import BiliApi
 
 logging.basicConfig(level=logging.INFO)
 
@@ -9,12 +9,12 @@ def setting_test():
     logging.info(f"Get setting: {setting}")
 
 def proxyApi_test():
-    from fetcher.proxyApi import ProxyApi
+    from api.proxyApi import ProxyApi
     proxy_api = ProxyApi()
     print(proxy_api.get_proxy())
 
 def biliApi_test():
-    from fetcher.biliApi import BiliApi
+    from api.biliApi import BiliApi
     bili_api = BiliApi()
     print(bili_api.get_cid_by_bid("BV1Nq4y1A7Vk"))
     l = bili_api.get_up_video_by_mid(347235)

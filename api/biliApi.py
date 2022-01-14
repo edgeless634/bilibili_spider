@@ -19,7 +19,7 @@ class BiliApi:
             self.proxies = {}
 
     def set_proxy(self):
-        from fetcher.proxyApi import ProxyApi
+        from api.proxyApi import ProxyApi
         proxy_api = ProxyApi()
         proxy = proxy_api.get_proxy()
         self.proxies = {

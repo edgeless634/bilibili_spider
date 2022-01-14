@@ -1,7 +1,7 @@
 import logging
 from random import random
 from threading import Thread
-from fetcher.biliApi import BiliApi
+from api.biliApi import BiliApi
 from setting.settingReader import setting
 from utils.datafields import datafields
 import time

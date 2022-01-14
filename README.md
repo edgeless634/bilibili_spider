@@ -54,7 +54,7 @@ python biliSpider.py run
   - video_danmaku # 抓取到的弹幕，文件命名格式为"{av号}.txt"
   - aid_done # 已经获取到的弹幕
   - mid_done # 已经获取到的up
-- fetcher # 和网络交互的API
+- api # 和网络交互的API
   - biliApi.py # B站的API
   - proxyApi.py # proxy_pool的API
 - helper
