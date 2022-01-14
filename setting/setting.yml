@@ -1,7 +1,7 @@
 launcher:
-    comment_fetcher_thread_num: 4
+    danmaku_fetcher_thread_num: 4
     user_following_fetcher_thread_num: 1
-CommentFetcher:
+DanmakuFetcher:
     wait_time_each: 5
 UserFollowingFetcher:
     wait_time_each: 5

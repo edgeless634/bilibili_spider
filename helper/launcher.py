@@ -1,9 +1,9 @@
-from helper.fetch import CommentFetcher, UserFollowingFetcher
+from helper.fetch import DanmakuFetcher, UserFollowingFetcher
 from setting.settingReader import setting
 
-def get_comment_fetchers_threads():
-    thread_num = setting["launcher"]["comment_fetcher_thread_num"]
-    threads = [CommentFetcher() for _ in range(thread_num)]
+def get_danmaku_fetchers_threads():
+    thread_num = setting["launcher"]["danmaku_fetcher_thread_num"]
+    threads = [DanmakuFetcher() for _ in range(thread_num)]
     return threads
 
 def get_user_following_fetchers_threads():
@@ -12,7 +12,7 @@ def get_user_following_fetchers_threads():
     return threads
 
 def launch():
-    threads = get_comment_fetchers_threads() + get_user_following_fetchers_threads()
+    threads = get_danmaku_fetchers_threads() + get_user_following_fetchers_threads()
     for t in threads:
         t.start()
     for t in threads:

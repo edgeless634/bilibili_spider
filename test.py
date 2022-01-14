@@ -28,9 +28,9 @@ def biliApi_test():
     relations = bili_api.get_relationship_info_by_mid(385842994)
     print(relations)
 
-def CommentFetcher_test():
-    from helper.fetch import CommentFetcher
-    t = CommentFetcher()
+def DanmakuFetcher_test():
+    from helper.fetch import DanmakuFetcher
+    t = DanmakuFetcher()
     t.start()
     t.join()
 
@@ -41,4 +41,4 @@ def UserFollowingFetcher_test():
     t.join()
 
 if __name__ == '__main__':
-    biliApi_test()
+    DanmakuFetcher_test()

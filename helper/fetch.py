@@ -30,13 +30,13 @@ class BaseFetcher(Thread):
         datafields.new_field(self.__down_field)
     
 
-class CommentFetcher(BaseFetcher):
+class DanmakuFetcher(BaseFetcher):
 
     def __init__(self):
         super().__init__()
         self.up_field = "up_mid"
-        self.down_field = "video_comment"
-        self.sleep_time_each = setting["CommentFetcher"]["wait_time_each"]
+        self.down_field = "video_danmaku"
+        self.sleep_time_each = setting["DanmakuFetcher"]["wait_time_each"]
         self.found_up = set()
         self.BiliApi = BiliApi()
 
@@ -49,15 +49,15 @@ class CommentFetcher(BaseFetcher):
                 yield up_mid
                 self.found_up.add(up_mid)
     
-    def save_video_comment(self, mid: int):
+    def save_video_danmaku(self, mid: int):
         for video in self.BiliApi.get_up_video_by_mid(mid):
             t = time.perf_counter()
 
             aid = video["aid"]
             cid = self.BiliApi.get_cid_by_aid(aid)
-            comment = self.BiliApi.get_danmaku_list_by_cid(cid)
-            datafields.save_to_field(self.down_field, "\n".join(comment), filename=f"{aid}.txt")
-            logging.info(f"[CommentFetcher] Saved: {aid}")
+            danmaku = self.BiliApi.get_danmaku_list_by_cid(cid)
+            datafields.save_to_field(self.down_field, "\n".join(danmaku), filename=f"{aid}.txt")
+            logging.info(f"[DanmakuFetcher] Saved: {aid}")
 
             use_time = time.perf_counter() - t
             sleep_time = self.sleep_time_each - use_time
@@ -66,7 +66,7 @@ class CommentFetcher(BaseFetcher):
 
     def run(self):
         for mid in self.get_up_mid():
-            self.save_video_comment(mid)
+            self.save_video_danmaku(mid)
 
 
 class UserFollowingFetcher(BaseFetcher):
