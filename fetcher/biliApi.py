@@ -14,15 +14,18 @@ class BiliApi:
         }
         self.__timeout = 5
         if setting["proxyFetch"]["enable"] is True:
-            from fetcher.proxyFetcher import ProxyFetcher
-            proxy_fetcher = ProxyFetcher()
-            proxy = proxy_fetcher.get_proxy()
-            self.proxies = {
-                "http": proxy,
-                "https": proxy
-            }
+            self.set_proxy()
         else:
             self.proxies = {}
+
+    def set_proxy(self):
+        from fetcher.proxyFetcher import ProxyFetcher
+        proxy_fetcher = ProxyFetcher()
+        proxy = proxy_fetcher.get_proxy()
+        self.proxies = {
+            "http": proxy,
+            "https": proxy
+        }
 
     def __base_get_bili_api(self, url, params):
         '''
@@ -43,8 +46,9 @@ class BiliApi:
                     # {'code': 22007, 'message': '限制只访问前5页', 'ttl': 1}
                     # {'code': 22115, 'message': '用户已设置隐私，无法查看', 'ttl': 1}
                     break
+                self.set_proxy()
             except requests.exceptions.RequestException:
-                pass
+                self.set_proxy()
         if d["code"] == 22115 or d["code"] == 22007:
             return None
         return d["data"]
@@ -86,7 +90,7 @@ class BiliApi:
                 soup = BeautifulSoup(r.text, "lxml")
                 break
             except requests.exceptions.RequestException:
-                pass
+                self.set_proxy()
         l = [(i.text, float(i.attrs["p"].split(",")[0])) for i in soup.select("d")]
         l.sort(key = lambda x: x[1])
         return [i[0] for i in l]
