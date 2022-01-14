@@ -47,6 +47,7 @@ class BiliApi:
                     # {'code': 22115, 'message': '用户已设置隐私，无法查看', 'ttl': 1}
                     break
                 self.set_proxy()
+                logging.info("[BiliApi] proxy changed.")
             except requests.exceptions.RequestException:
                 self.set_proxy()
         if d["code"] == 22115 or d["code"] == 22007:
