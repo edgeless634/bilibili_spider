@@ -1,4 +1,5 @@
 from setting.settingReader import setting
+from utils.randomsleep import random_sleep
 import requests
 import logging
 import json
@@ -20,7 +21,7 @@ class ProxyFetcher:
                 d = json.loads(r.text)
                 if "proxy" not in d:
                     logging.warning(f"No proxy for now, wait for 5s.")
-                    time.sleep(5)
+                    random_sleep(5)
                     continue
                 break
             except requests.exceptions.RequestException:

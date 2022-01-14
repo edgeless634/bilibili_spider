@@ -5,6 +5,8 @@ from setting.settingReader import setting
 from utils.datafields import datafields
 import time
 
+from utils.randomsleep import random_sleep
+
 class BaseFetcher(Thread):
     def __init__(self):
         super().__init__()
@@ -62,7 +64,7 @@ class DanmakuFetcher(BaseFetcher):
             use_time = time.perf_counter() - t
             sleep_time = self.sleep_time_each - use_time
             if sleep_time > 0:
-                time.sleep(sleep_time)
+                random_sleep(sleep_time)
 
     def run(self):
         for mid in self.get_up_mid():
@@ -113,7 +115,7 @@ class UserFollowingFetcher(BaseFetcher):
             use_time = time.perf_counter() - t
             sleep_time = self.sleep_time_each_step - use_time
             if sleep_time > 0:
-                time.sleep(sleep_time)
+                random_sleep(sleep_time)
 
 
     
@@ -126,4 +128,4 @@ class UserFollowingFetcher(BaseFetcher):
             use_time = time.perf_counter() - t
             sleep_time = self.sleep_time_each - use_time
             if sleep_time > 0:
-                time.sleep(sleep_time)
+                random_sleep(sleep_time)
