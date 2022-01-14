@@ -1,5 +1,7 @@
 import logging
 
+from fetcher.biliApi import BiliApi
+
 logging.basicConfig(level=logging.INFO)
 
 def setting_test():
@@ -39,4 +41,4 @@ def UserFollowingFetcher_test():
     t.join()
 
 if __name__ == '__main__':
-    UserFollowingFetcher_test()
+    biliApi_test()

@@ -24,27 +24,41 @@ class BiliApi:
         else:
             self.proxies = {}
 
-    def get_cid_by_aid(self, input_aid: int) -> int:
+    def __base_get_bili_api(self, url, params):
         '''
-        根据视频aid(即AV号)返回视频的cid
+        从Bilibili的API中获取信息
         '''
-        url = "https://api.bilibili.com/x/player/pagelist"
         while True:
             try:
                 r = requests.get(
                     url,
                     headers=self.headers,
-                    params = {"aid": input_aid},
+                    params = params,
                     proxies = self.proxies,
                     timeout=self.__timeout
                 )
                 r.encoding = r.apparent_encoding
                 d = json.loads(r.text)
-                if d["code"] == 0:
+                if d["code"] == 0 or d["code"] == 22115 or d["code"] == 22007:
+                    # {'code': 22007, 'message': '限制只访问前5页', 'ttl': 1}
+                    # {'code': 22115, 'message': '用户已设置隐私，无法查看', 'ttl': 1}
                     break
             except requests.exceptions.RequestException:
                 pass
-        return d["data"][0]["cid"]
+        if d["code"] == 22115 or d["code"] == 22007:
+            return None
+        return d["data"]
+
+    def get_cid_by_aid(self, input_aid: int) -> int:
+        '''
+        根据视频aid(即AV号)返回视频的cid
+        '''
+        url = "https://api.bilibili.com/x/player/pagelist"
+        params = {"aid": input_aid}
+        data = self.__base_get_bili_api(url, params)
+        if data is None:
+            return None
+        return data[0]["cid"]
     
     def get_cid_by_bid(self, input_bid: str) -> int:
         '''
@@ -85,27 +99,12 @@ class BiliApi:
         url = "https://api.bilibili.com/x/space/arc/search"
         ret = []
         for pn in range(1, 10000000):
-            while True:
-                try:
-                    r = requests.get(
-                        url,
-                        headers=self.headers,
-                        params = {"mid": input_mid, "pn": pn},
-                        proxies=self.proxies,
-                        timeout=self.__timeout
-                    )
-                    r.encoding = r.apparent_encoding
-                    d = json.loads(r.text)
-                    if d["code"] == 0:
-                        break
-                    else:
-                        logging.warning(f"[get_up_video_by_mid]网络错误: {d}, {input_mid}")
-                        time.sleep(1)
-                except requests.exceptions.RequestException as e:
-                    logging.warning(f"[get_up_video_by_mid]网络不稳定：{e}")
-                    time.sleep(1)
+            params = {"mid": input_mid, "pn": pn}
+            data = self.__base_get_bili_api(url, params)
 
-            videos = d["data"]["list"]["vlist"]
+            if data is None:
+                break
+            videos = data["list"]["vlist"]
             assert isinstance(videos, list)
 
             for video_data in videos:
@@ -114,7 +113,7 @@ class BiliApi:
                     "aid": video_data["aid"],
                 })
 
-            video_count = d["data"]["page"]["count"]
+            video_count = data["page"]["count"]
             if pn * 30 > video_count:
                 break
         return ret
@@ -124,25 +123,8 @@ class BiliApi:
         获取用户基本信息
         '''
         url = "https://api.bilibili.com/x/relation/stat"
-        while True:
-            try:
-                r = requests.get(
-                    url,
-                    headers=self.headers,
-                    params = {"vmid": input_mid, "jsonp": "jsonp"},
-                    proxies = self.proxies,
-                    timeout=self.__timeout
-                )
-                r.encoding = r.apparent_encoding
-                d = json.loads(r.text)
-                if d["code"] == 0 or d["code"] == 22115:
-                    # {'code': 22115, 'message': '用户已设置隐私，无法查看', 'ttl': 1}
-                    break
-            except requests.exceptions.RequestException:
-                pass
-        if d["code"] == 22115:
-            return None
-        return d["data"]
+        params = {"vmid": input_mid, "jsonp": "jsonp"}
+        return self.__base_get_bili_api(url, params)
     
     def get_user_level_by_mid(self, input_mid: int):
         '''
@@ -151,32 +133,15 @@ class BiliApi:
         user_info = self.get_user_info_by_mid(input_mid)
         if user_info is None:
             return None
-        return d["level"]
+        return user_info["level"]
 
     def get_relationship_info_by_mid(self, input_mid: int):
         '''
         获取用户关注和粉丝数
         '''
         url = "https://api.bilibili.com/x/relation/stat"
-        while True:
-            try:
-                r = requests.get(
-                    url,
-                    headers=self.headers,
-                    params = {"vmid": input_mid, "jsonp": "jsonp"},
-                    proxies = self.proxies,
-                    timeout=self.__timeout
-                )
-                r.encoding = r.apparent_encoding
-                d = json.loads(r.text)
-                if d["code"] == 0 or d["code"] == 22115:
-                    # {'code': 22115, 'message': '用户已设置隐私，无法查看', 'ttl': 1}
-                    break
-            except requests.exceptions.RequestException:
-                pass
-        if d["code"] == 22115:
-            return None
-        return d["data"]
+        params = {"vmid": input_mid, "jsonp": "jsonp"}
+        return self.__base_get_bili_api(url, params)
     
     def get_user_fans_num_by_mid(self, input_mid: int) -> list:
         '''
@@ -196,43 +161,17 @@ class BiliApi:
         ret = []
         url = "https://api.bilibili.com/x/relation/followings"
         for pn in range(1, 10000000):
-            while True:
-                try:
-                    r = requests.get(
-                        url,
-                        headers=self.headers,
-                        params = {"vmid": input_mid, "pn": pn},
-                        proxies=self.proxies,
-                        timeout=self.__timeout
-                    )
-                    r.encoding = r.apparent_encoding
-                    d = json.loads(r.text)
-                    if d["code"] == 0 or d["code"] == 22115 or d["code"] == 22007:
-                        # {'code': 22007, 'message': '限制只访问前5页', 'ttl': 1}
-                        # {'code': 22115, 'message': '用户已设置隐私，无法查看', 'ttl': 1}
-                        break
-                    else:
-                        logging.warning(f"[get_following_by_mid]网络错误: {d}")
-                        time.sleep(1)
-                except requests.exceptions.RequestException as e:
-                    logging.warning(f"[get_following_by_mid]网络不稳定：{e}")
-                    time.sleep(1)
-
-            if d["code"] == 22115:
-                # {'code': 22115, 'message': '用户已设置隐私，无法查看', 'ttl': 1}
+            params = {"vmid": input_mid, "pn": pn}
+            data = self.__base_get_bili_api(url, params)
+            if data is None:
                 break
-
-            if d["code"] == 22007:
-                # {'code': 22007, 'message': '限制只访问前5页', 'ttl': 1}
-                break
-
-            followings = d["data"]["list"]
+            followings = data["list"]
             assert isinstance(followings, list)
 
             for following_data in followings:
                 ret.append(following_data["mid"])
 
-            video_count = d["data"]["total"]
+            video_count = data["total"]
             if pn * 30 > video_count:
                 break
         return ret
