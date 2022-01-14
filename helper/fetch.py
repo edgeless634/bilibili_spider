@@ -66,6 +66,7 @@ class DanmakuFetcher(BaseFetcher):
 
     def get_up_mid(self):
         while True:
+            time.sleep(self.sleep_time_each_step)
             up_mid = datafields.get_field_data(self.up_field)
             if up_mid is None:
                 return
@@ -80,6 +81,7 @@ class DanmakuFetcher(BaseFetcher):
             aid = video["aid"]
             if aid in self.found_aid:
                 logging.info(f"[DanmakuFetcher] Ignore, as it is downloaded: {aid}")
+                time.sleep(self.sleep_time_each_step)
                 continue
             cid = self.BiliApi.get_cid_by_aid(aid)
             time.sleep(self.sleep_time_each_step)
