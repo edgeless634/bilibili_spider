@@ -13,15 +13,15 @@ class BiliApi:
             "User-Agent": userAgent.get_user_agent()
         }
         self.__timeout = 5
-        if setting["proxyFetch"]["enable"] is True:
+        if setting["proxyApi"]["enable"] is True:
             self.set_proxy()
         else:
             self.proxies = {}
 
     def set_proxy(self):
-        from fetcher.proxyFetcher import ProxyFetcher
-        proxy_fetcher = ProxyFetcher()
-        proxy = proxy_fetcher.get_proxy()
+        from fetcher.proxyApi import ProxyApi
+        proxy_api = ProxyApi()
+        proxy = proxy_api.get_proxy()
         self.proxies = {
             "http": proxy,
             "https": proxy

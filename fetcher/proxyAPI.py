@@ -5,13 +5,13 @@ import logging
 import json
 import time
 
-class ProxyFetcher:
+class ProxyApi:
 
     def __init__(self):
-        self.api_url = setting["proxyFetch"]["api_url"]
+        self.api_url = setting["proxyApi"]["api_url"]
         self.proxies = {
-            "http": setting["proxyFetch"]["proxy_for_proxyfetch"],
-            "https": setting["proxyFetch"]["proxy_for_proxyfetch"],
+            "http": setting["proxyApi"]["proxy_for_proxyapi"],
+            "https": setting["proxyApi"]["proxy_for_proxyapi"],
         }
         
     def get_proxy(self):
@@ -29,5 +29,5 @@ class ProxyFetcher:
         return "http://" + d["proxy"]
 
 if __name__ == '__main__':
-    o = ProxyFetcher()
+    o = ProxyApi()
     print(o.get_proxy())

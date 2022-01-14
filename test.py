@@ -8,10 +8,10 @@ def setting_test():
     from setting.settingReader import setting
     logging.info(f"Get setting: {setting}")
 
-def proxyFetcher_test():
-    from fetcher.proxyFetcher import ProxyFetcher 
-    proxy_fetcher = ProxyFetcher()
-    print(proxy_fetcher.get_proxy())
+def proxyApi_test():
+    from fetcher.proxyApi import ProxyApi
+    proxy_api = ProxyApi()
+    print(proxy_api.get_proxy())
 
 def biliApi_test():
     from fetcher.biliApi import BiliApi

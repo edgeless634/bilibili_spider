@@ -11,10 +11,10 @@ DanmakuFetcher:
 UserFollowingFetcher:
     wait_time_each: 2
     wait_time_each_step: 1
-proxyFetch:
+proxyApi:
     enable: false
     api_url: "http://127.0.0.1:5010/get/"
-    proxy_for_proxyfetch: ""
+    proxy_for_proxyapi: ""
 """
 setting = None
 

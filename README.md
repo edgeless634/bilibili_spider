@@ -56,7 +56,7 @@ python biliSpider.py run
   - mid_done # 已经获取到的up
 - fetcher # 和网络交互的API
   - biliApi.py # B站的API
-  - proxyFetcher.py # proxy_pool的API
+  - proxyApi.py # proxy_pool的API
 - helper
   - fetch.py # 爬取B站的worker
   - launch # 启动worker
