@@ -108,16 +108,14 @@ class UserFollowingFetcher(BaseFetcher):
 
             if filter_following(follow_mid):
                 followings_filtered.append(follow_mid)
+                datafields.save_to_field(self.down_field, f"\n{follow_mid}", filename=f"{mid}_followings.txt", mode="a")
             
             use_time = time.perf_counter() - t
             sleep_time = self.sleep_time_each_step - use_time
             if sleep_time > 0:
                 time.sleep(sleep_time)
 
-        if followings_filtered == []:
-            return
 
-        datafields.save_to_field(self.down_field, "\n".join(followings_filtered), filename=f"{mid}_followings.txt")
     
     def run(self):
         for mid in self.get_mid():

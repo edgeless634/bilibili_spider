@@ -54,7 +54,7 @@ class DataField:
             ret = self.field_cache[fieldname].pop()
             return ret
 
-    def save_to_field(self, fieldname, s, filename=None):
+    def save_to_field(self, fieldname, s, filename=None, mode="w"):
         if filename is None:
             for i in range(16, len(s)):
                 filename = f"{s[:i].__hash__()}.txt"
@@ -63,7 +63,7 @@ class DataField:
                     break
         else:
             path = os.path.join(get_path(fieldname), filename)
-        with open(path, "w", encoding="utf-8") as f:
+        with open(path, mode, encoding="utf-8") as f:
             f.write(s)
 
 
