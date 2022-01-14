@@ -16,6 +16,7 @@ class DataField:
     def __init__(self):
         self.fields = set()
         self.field_cache = {}
+        self.field_sent = {}
         self.load_field()
         self.lock = threading.Lock()
 
@@ -44,14 +45,17 @@ class DataField:
 
     def get_field_data(self, fieldname):
         with self.lock:
+            if fieldname not in self.field_sent:
+                self.field_sent[fieldname] = set()
             if fieldname not in self.field_cache or self.field_cache[fieldname] == []:
                 self.field_cache[fieldname] = "\n".join(self.load_field_data(fieldname)).split("\n")
-                self.field_cache[fieldname] = [i for i in self.field_cache[fieldname] if i != ""]
+                self.field_cache[fieldname] = [i for i in self.field_cache[fieldname] if i != "" and i not in self.field_sent]
 
             if self.field_cache[fieldname] == []:
                 return None
             
             ret = self.field_cache[fieldname].pop()
+            self.field_sent[fieldname].add(ret)
             return ret
 
     def save_to_field(self, fieldname, s, filename=None, mode="w"):
