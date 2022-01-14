@@ -26,7 +26,6 @@ class ProxyFetcher:
                 break
             except requests.exceptions.RequestException:
                 pass
-        print(d)
         return "http://" + d["proxy"]
 
 if __name__ == '__main__':

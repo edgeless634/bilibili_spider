@@ -47,10 +47,22 @@ class DanmakuFetcher(BaseFetcher):
         self.done_mid_field = "mid_done"
         datafields.new_field(self.done_mid_field)
         self.done_mid_field_save_name = f"{str(self.name.__hash__())[:8]}.txt"
+        self.load_found_up()
+
+        self.found_aid = set()
+
+        self.done_aid_field = "aid_done"
+        datafields.new_field(self.done_aid_field)
+        self.done_aid_field_save_name = f"{str(self.name.__hash__())[:8]}.txt"
+        self.load_found_aid()
     
     def load_found_up(self):
         l = "\n".join(datafields.load_field_data(self.done_mid_field)).split("\n")
-        self.found_up.update(set(l))
+        self.found_up.update(set([int(i) for i in l if i != ""]))
+
+    def load_found_aid(self):
+        l = "\n".join(datafields.load_field_data(self.done_aid_field)).split("\n")
+        self.found_aid.update(set([int(i) for i in l if i != ""]))
 
     def get_up_mid(self):
         while True:
@@ -66,11 +78,15 @@ class DanmakuFetcher(BaseFetcher):
             t = time.perf_counter()
 
             aid = video["aid"]
+            if aid in self.found_aid:
+                logging.info(f"[DanmakuFetcher] Ignore, as it is downloaded: {aid}")
+                continue
             cid = self.BiliApi.get_cid_by_aid(aid)
             time.sleep(self.sleep_time_each_step)
             danmaku = self.BiliApi.get_danmaku_list_by_cid(cid)
             datafields.save_to_field(self.down_field, "\n".join(danmaku), filename=f"{aid}.txt")
             logging.info(f"[DanmakuFetcher] Saved: {aid}")
+            datafields.save_to_field(self.done_aid_field, "\n"+str(aid), filename=self.done_aid_field_save_name, mode="a")
 
             use_time = time.perf_counter() - t
             sleep_time = self.sleep_time_each - use_time
