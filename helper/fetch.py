@@ -39,6 +39,7 @@ class DanmakuFetcher(BaseFetcher):
         self.up_field = "up_mid"
         self.down_field = "video_danmaku"
         self.sleep_time_each = setting["DanmakuFetcher"]["wait_time_each"]
+        self.sleep_time_each_step = setting["DanmakuFetcher"]["wait_time_each_step"]
         self.found_up = set()
         self.BiliApi = BiliApi()
 
@@ -57,6 +58,7 @@ class DanmakuFetcher(BaseFetcher):
 
             aid = video["aid"]
             cid = self.BiliApi.get_cid_by_aid(aid)
+            time.sleep(self.sleep_time_each_step)
             danmaku = self.BiliApi.get_danmaku_list_by_cid(cid)
             datafields.save_to_field(self.down_field, "\n".join(danmaku), filename=f"{aid}.txt")
             logging.info(f"[DanmakuFetcher] Saved: {aid}")
@@ -116,7 +118,6 @@ class UserFollowingFetcher(BaseFetcher):
             sleep_time = self.sleep_time_each_step - use_time
             if sleep_time > 0:
                 random_sleep(sleep_time)
-
 
     
     def run(self):
