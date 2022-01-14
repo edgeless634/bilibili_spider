@@ -69,7 +69,11 @@ python biliSpider.py run
   - randomsleep.py # 随机秒数的time.sleep
   - userAgent.py # 提供随机的userAgent
 
+## LICENSE
 
+MIT
+
+本项目当前版本和git仓库中本版本前未附带许可证的所有版本都使用MIT许可证
 
 
 
