@@ -19,6 +19,9 @@ def biliApi_test():
     print(cid)
     danmaku = bili_api.get_danmaku_list_by_cid(cid)
     print(danmaku[:8])
+    followings = bili_api.get_following_by_mid(385842994)
+    print(followings[:10])
+
 
 def CommentFetcher_test():
     from helper.fetch import CommentFetcher
@@ -27,4 +30,4 @@ def CommentFetcher_test():
     t.join()
 
 if __name__ == '__main__':
-    CommentFetcher_test()
+    biliApi_test()

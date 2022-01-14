@@ -119,6 +119,45 @@ class BiliApi:
                 break
         return ret
 
+    def get_following_by_mid(self, input_mid: int) -> list:
+        '''
+        根据id返回Ta的关注
+        返回格式: [mid, ]
+        '''
+        ret = []
+        url = "https://api.bilibili.com/x/relation/followings"
+        for pn in range(1, 10000000):
+            while True:
+                try:
+                    r = requests.get(
+                        url,
+                        headers=self.headers,
+                        params = {"vmid": input_mid, "pn": pn},
+                        proxies=self.proxies,
+                        timeout=self.__timeout
+                    )
+                    r.encoding = r.apparent_encoding
+                    d = json.loads(r.text)
+                    if d["code"] == 0:
+                        break
+                    else:
+                        logging.warning(f"[get_up_video_by_mid]网络错误: {d}")
+                        time.sleep(1)
+                except requests.exceptions.RequestException as e:
+                    logging.warning(f"[get_up_video_by_mid]网络不稳定：{e}")
+                    time.sleep(1)
+
+            followings = d["data"]["list"]
+            assert isinstance(followings, list)
+
+            for following_data in followings:
+                ret.append(following_data["mid"])
+
+            video_count = d["data"]["total"]
+            if pn * 30 > video_count:
+                break
+        return ret
+
     def change_user_agent(self, user_agent = userAgent.get_user_agent()):
         self.headers["User-Agent"] = user_agent
     

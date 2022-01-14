@@ -32,8 +32,4 @@ def encode(x):
 
 if __name__ == "__main__":
     print(decode('BV17x411w7KC'))
-    print(decode('BV1Q541167Qg'))
-    print(decode('BV1mK4y1C7Bz'))
-    print(encode(170001))
-    print(encode(455017605))
-    print(encode(882584971))
+    print(encode(977937344))
