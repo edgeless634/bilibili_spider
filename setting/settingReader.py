@@ -4,16 +4,17 @@ import yaml
 __default_str = """
 launcher:
     danmaku_fetcher_thread_num: 4
-    user_following_fetcher_thread_num: 1
+    user_following_fetcher_thread_num: 2
 DanmakuFetcher:
-    wait_time_each: 5
+    wait_time_each: 2
+    wait_time_each_step: 1
 UserFollowingFetcher:
-    wait_time_each: 5
-    wait_time_each_step: 2
+    wait_time_each: 2
+    wait_time_each_step: 1
 proxyFetch:
     enable: false
-    api_url: "http://192.168.1.21:10001/get/"
-    proxy_for_proxyfetch: "http://127.0.0.1:10809"
+    api_url: "http://127.0.0.1:5010/get/"
+    proxy_for_proxyfetch: ""
 """
 setting = None
 
