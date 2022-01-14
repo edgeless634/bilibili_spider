@@ -9,5 +9,5 @@ UserFollowingFetcher:
     wait_time_each_step: 3
 proxyFetch:
     enable: false
-    api_url: "http://192.168.1.21:10001/get/"
-    proxy_for_proxyfetch: "http://127.0.0.1:10809"
+    api_url: "http://127.0.0.1:5010/get/"
+    proxy_for_proxyfetch: ""

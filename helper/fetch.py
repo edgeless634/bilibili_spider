@@ -1,4 +1,5 @@
 import logging
+from random import random
 from threading import Thread
 from fetcher.biliApi import BiliApi
 from setting.settingReader import setting
@@ -43,6 +44,14 @@ class DanmakuFetcher(BaseFetcher):
         self.found_up = set()
         self.BiliApi = BiliApi()
 
+        self.done_mid_field = "mid_done"
+        datafields.new_field(self.done_mid_field)
+        self.done_mid_field_save_name = f"{str(self.name.__hash__())[:8]}.txt"
+    
+    def load_found_up(self):
+        l = "\n".join(datafields.load_field_data(self.done_mid_field)).split("\n")
+        self.found_up.update(set(l))
+
     def get_up_mid(self):
         while True:
             up_mid = datafields.get_field_data(self.up_field)
@@ -67,6 +76,7 @@ class DanmakuFetcher(BaseFetcher):
             sleep_time = self.sleep_time_each - use_time
             if sleep_time > 0:
                 random_sleep(sleep_time)
+        datafields.save_to_field(self.done_mid_field, "\n"+str(mid), filename=self.done_mid_field_save_name, mode="a")
 
     def run(self):
         for mid in self.get_up_mid():
