@@ -6,7 +6,7 @@ from setting.settingReader import setting
 from utils.datafields import datafields
 import time
 
-from utils.randomsleep import random_sleep
+from utils.randomsleep import random_sleep, Sleeper
 
 class BaseFetcher(Thread):
     def __init__(self):
@@ -66,7 +66,7 @@ class DanmakuFetcher(BaseFetcher):
 
     def get_up_mid(self):
         while True:
-            time.sleep(self.sleep_time_each_step)
+            random_sleep(self.sleep_time_each_step)
             up_mid = datafields.get_field_data(self.up_field)
             if up_mid is None:
                 return
@@ -76,24 +76,20 @@ class DanmakuFetcher(BaseFetcher):
     
     def save_video_danmaku(self, mid: int):
         for video in self.BiliApi.get_up_video_by_mid(mid):
-            t = time.perf_counter()
+            sleeper = Sleeper(self.sleep_time_each)
 
             aid = video["aid"]
             if aid in self.found_aid:
                 logging.info(f"[DanmakuFetcher] Ignore, as it is downloaded: {aid}")
-                #time.sleep(self.sleep_time_each_step)
                 continue
             cid = self.BiliApi.get_cid_by_aid(aid)
-            time.sleep(self.sleep_time_each_step)
+            random_sleep(self.sleep_time_each_step)
             danmaku = self.BiliApi.get_danmaku_list_by_cid(cid)
             datafields.save_to_field(self.down_field, "\n".join(danmaku), filename=f"{aid}.txt")
             logging.info(f"[DanmakuFetcher] Saved: {aid}")
             datafields.save_to_field(self.done_aid_field, "\n"+str(aid), filename=self.done_aid_field_save_name, mode="a")
 
-            use_time = time.perf_counter() - t
-            sleep_time = self.sleep_time_each - use_time
-            if sleep_time > 0:
-                random_sleep(sleep_time)
+            sleeper.sleep()
         datafields.save_to_field(self.done_mid_field, "\n"+str(mid), filename=self.done_mid_field_save_name, mode="a")
 
     def run(self):
@@ -136,25 +132,19 @@ class UserFollowingFetcher(BaseFetcher):
             return True
 
         for follow_mid in followings:
-            t = time.perf_counter()
+            sleeper = Sleeper(self.sleep_time_each)
 
             if filter_following(follow_mid):
                 followings_filtered.append(follow_mid)
                 datafields.save_to_field(self.down_field, f"\n{follow_mid}", filename=f"{mid}_followings.txt", mode="a")
             
-            use_time = time.perf_counter() - t
-            sleep_time = self.sleep_time_each_step - use_time
-            if sleep_time > 0:
-                random_sleep(sleep_time)
+            sleeper.sleep()
 
     
     def run(self):
         for mid in self.get_mid():
-            t = time.perf_counter()
+            sleeper = Sleeper(self.sleep_time_each)
 
             self.save_user_following(mid)
 
-            use_time = time.perf_counter() - t
-            sleep_time = self.sleep_time_each - use_time
-            if sleep_time > 0:
-                random_sleep(sleep_time)
+            sleeper.sleep()
