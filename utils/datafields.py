@@ -1,7 +1,9 @@
 import os
-
+import random
 import logging
 import threading
+
+
 base_path = os.path.dirname(os.path.dirname(__file__))
 base_path = os.path.join(base_path, "datafield")
 
@@ -49,6 +51,7 @@ class DataField:
                 self.field_sent[fieldname] = set()
             if fieldname not in self.field_cache or self.field_cache[fieldname] == []:
                 self.field_cache[fieldname] = "\n".join(self.load_field_data(fieldname)).split("\n")
+                random.shuffle(self.field_cache[fieldname])
                 self.field_cache[fieldname] = [i for i in self.field_cache[fieldname] if i != "" and i not in self.field_sent]
 
             if self.field_cache[fieldname] == []:
