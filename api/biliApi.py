@@ -19,6 +19,9 @@ class BiliApi:
             self.proxies = {}
 
     def set_proxy(self):
+        '''
+        获取代理
+        '''
         from api.proxyApi import ProxyApi
         proxy_api = ProxyApi()
         proxy = proxy_api.get_proxy()

@@ -9,6 +9,9 @@ import time
 from utils.randomsleep import random_sleep, Sleeper
 
 class BaseFetcher(Thread):
+    '''
+    fetcher模板
+    '''
     def __init__(self):
         super().__init__()
         self.__up_field = ""
@@ -34,8 +37,13 @@ class BaseFetcher(Thread):
     
 
 class DanmakuFetcher(BaseFetcher):
-
+    '''
+    弹幕fetcher，一个抓取弹幕的爬虫线程
+    '''
     def __init__(self):
+        '''
+        创建必要的field，读取相关设置
+        '''
         super().__init__()
         self.up_field = "up_mid"
         self.down_field = "video_danmaku"
@@ -57,14 +65,23 @@ class DanmakuFetcher(BaseFetcher):
         self.load_found_aid()
     
     def load_found_up(self):
+        '''
+        从field中读取先前的进度
+        '''
         l = "\n".join(datafields.load_field_data(self.done_mid_field)).split("\n")
         self.found_up.update(set([int(i) for i in l if i != ""]))
 
     def load_found_aid(self):
+        '''
+        从field中读取先前的进度
+        '''
         l = "\n".join(datafields.load_field_data(self.done_aid_field)).split("\n")
         self.found_aid.update(set([int(i) for i in l if i != ""]))
 
     def get_up_mid(self):
+        '''
+        从field中读取需要爬取的up
+        '''
         while True:
             random_sleep(self.sleep_time_each_step)
             up_mid = datafields.get_field_data(self.up_field)
@@ -75,6 +92,9 @@ class DanmakuFetcher(BaseFetcher):
                 self.found_up.add(up_mid)
     
     def save_video_danmaku(self, mid: int):
+        '''
+        根据用户mid爬取所有视频的弹幕
+        '''
         for video in self.BiliApi.get_up_video_by_mid(mid):
             sleeper = Sleeper(self.sleep_time_each)
 
@@ -93,12 +113,21 @@ class DanmakuFetcher(BaseFetcher):
         datafields.save_to_field(self.done_mid_field, "\n"+str(mid), filename=self.done_mid_field_save_name, mode="a")
 
     def run(self):
+        '''
+        运行线程
+        '''
         for mid in self.get_up_mid():
             self.save_video_danmaku(mid)
 
 
 class UserFollowingFetcher(BaseFetcher):
+    '''
+    关注fetcher，一个抓取关注的爬虫线程
+    '''
     def __init__(self):
+        '''
+        创建相关field，读取相关设置
+        '''
         super().__init__()
         self.up_field = "up_mid"
         self.down_field = "up_mid"
@@ -108,6 +137,9 @@ class UserFollowingFetcher(BaseFetcher):
         self.biliApi = BiliApi()
     
     def get_mid(self):
+        '''
+        获取需要爬取的mid
+        '''
         while True:
             mid = datafields.get_field_data(self.up_field)
             if mid is None:
@@ -117,12 +149,18 @@ class UserFollowingFetcher(BaseFetcher):
                 self.found_mid.add(mid)
     
     def save_user_following(self, mid):
+        '''
+        根据mid爬取ta的关注列表
+        '''
         logging.info(f"[UserFollowingFetcher] Start scanning: {mid}")
         followings = self.biliApi.get_following_by_mid(mid)
 
         followings_filtered = []
 
         def filter_following(mid):
+            '''
+            过滤普通用户
+            '''
             logging.info(f"[UserFollowingFetcher] Checking: {mid}")
             ret = self.biliApi.get_user_fans_num_by_mid(mid)
             if ret is None:
@@ -142,6 +180,9 @@ class UserFollowingFetcher(BaseFetcher):
 
     
     def run(self):
+        '''
+        运行
+        '''
         for mid in self.get_mid():
             sleeper = Sleeper(self.sleep_time_each)
 

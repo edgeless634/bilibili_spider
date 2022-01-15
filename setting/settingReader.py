@@ -20,6 +20,9 @@ setting = None
 
 
 def __init():
+    '''
+    读取设置
+    '''
     global setting
     file_path = os.path.dirname(__file__)
     setting = yaml.load(__default_str, Loader=yaml.CLoader)

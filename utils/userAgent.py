@@ -29,6 +29,9 @@ user_agents = __user_agent_str.split("\n")
 user_agents = [i.strip() for i in user_agents]
 
 def get_user_agent():
+    '''
+    随机返回一个PC的User-Agent字符串
+    '''
     return random.choice(user_agents)
 
 if __name__=="__main__":

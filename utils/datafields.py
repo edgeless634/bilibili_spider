@@ -15,6 +15,9 @@ def get_path(fieldname):
     return os.path.join(base_path, fieldname)
 
 class DataField:
+    '''
+    操作datafield/中数据的对象
+    '''
     def __init__(self):
         self.fields = set()
         self.field_cache = {}
@@ -23,12 +26,18 @@ class DataField:
         self.lock = threading.Lock()
 
     def load_field(self):
+        '''
+        load需要读取的field
+        '''
         for filename in os.listdir(base_path):
             if os.path.isfile(get_path(filename)):
                 continue
             self.fields.add(filename)
 
     def new_field(self, fieldname):
+        '''
+        新建field
+        '''
         if fieldname in self.fields:
             return
         abs_path = get_path(fieldname)
@@ -37,6 +46,10 @@ class DataField:
         self.fields.add(fieldname)
 
     def load_field_data(self, fieldname):
+        '''
+        读取field中的数据
+        注：本功能线程不安全，请不要用本函数读取一个会变化的field
+        '''
         ret = []
         for root, _, files in os.walk(get_path(fieldname)):
             for file in files:
@@ -46,6 +59,10 @@ class DataField:
         return ret
 
     def get_field_data(self, fieldname):
+        '''
+        读取field中的数据
+        注：本函数会随机返回一行数据
+        '''
         with self.lock:
             if fieldname not in self.field_sent:
                 self.field_sent[fieldname] = set()
@@ -62,6 +79,10 @@ class DataField:
             return ret
 
     def save_to_field(self, fieldname, s, filename=None, mode="w"):
+        '''
+        保存至field中的某个文件
+        注：请手动添加\\n
+        '''
         if filename is None:
             for i in range(16, len(s)):
                 filename = f"{s[:i].__hash__()}.txt"

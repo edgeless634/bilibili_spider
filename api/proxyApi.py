@@ -16,6 +16,11 @@ class ProxyApi:
         }
         
     def get_proxy(self):
+        '''
+        从proxy_pool项目中获取代理
+        格式为http://xxx.xxx.xxx.xxx:xxxxx
+        如果功能未开启则返回""
+        '''
         if not self.enable:
             return ""
         while True:
