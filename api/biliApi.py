@@ -50,9 +50,11 @@ class BiliApi:
                     # {'code': 22115, 'message': '用户已设置隐私，无法查看', 'ttl': 1}
                     break
                 self.set_proxy()
+                self.change_user_agent()
                 logging.info(f"[BiliApi] proxy changed: {params}")
             except requests.exceptions.RequestException:
                 self.set_proxy()
+                self.change_user_agent()
         if d["code"] == 22115 or d["code"] == 22007:
             return None
         return d["data"]
@@ -95,6 +97,7 @@ class BiliApi:
                 break
             except requests.exceptions.RequestException:
                 self.set_proxy()
+                self.change_user_agent()
         l = [(i.text, float(i.attrs["p"].split(",")[0])) for i in soup.select("d")]
         l.sort(key = lambda x: x[1])
         return [i[0] for i in l]
