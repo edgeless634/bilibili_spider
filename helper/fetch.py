@@ -81,7 +81,7 @@ class DanmakuFetcher(BaseFetcher):
             aid = video["aid"]
             if aid in self.found_aid:
                 logging.info(f"[DanmakuFetcher] Ignore, as it is downloaded: {aid}")
-                time.sleep(self.sleep_time_each_step)
+                #time.sleep(self.sleep_time_each_step)
                 continue
             cid = self.BiliApi.get_cid_by_aid(aid)
             time.sleep(self.sleep_time_each_step)
