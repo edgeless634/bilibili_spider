@@ -13,15 +13,18 @@ class BiliApi:
             "User-Agent": userAgent.get_user_agent()
         }
         self.__timeout = 5
-        if setting["proxyApi"]["enable"] is True:
+        self.use_proxy = setting["proxyApi"]["enable"]
+        if self.use_proxy:
             self.change_proxy()
         else:
             self.proxies = {}
 
     def change_proxy(self):
         '''
-        获取代理
+        更改代理
         '''
+        if not self.use_proxy:
+            return
         from api.proxyApi import ProxyApi
         proxy_api = ProxyApi()
         proxy = proxy_api.get_proxy()
