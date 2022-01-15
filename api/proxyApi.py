@@ -8,6 +8,7 @@ import time
 class ProxyApi:
 
     def __init__(self):
+        self.enable = setting["proxyApi"]["enable"]
         self.api_url = setting["proxyApi"]["api_url"]
         self.proxies = {
             "http": setting["proxyApi"]["proxy_for_proxyapi"],
@@ -15,6 +16,8 @@ class ProxyApi:
         }
         
     def get_proxy(self):
+        if not self.enable:
+            return ""
         while True:
             try:
                 r = requests.get(self.api_url, params={"type": "https"}, proxies=self.proxies)
